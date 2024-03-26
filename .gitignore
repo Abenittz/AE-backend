@@ -1,0 +1,14 @@
+/.history
+__pycache__/
+*.pyc
+
+*.env
+*.env.*
+
+/.vscode
+.DS_Store
+
+venv/
+env/
+.env/
+pip-lock.txt
