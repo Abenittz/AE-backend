@@ -227,7 +227,17 @@ class EventRegistrationView(APIView):
             return Response(read_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
            
+    def delete(self, request, id):
+        try:
+            get_event = Event.objects.get(id=id)
             
+        except Event.DoesNotExist:
+            return Response({'errors': 'user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        get_event.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
 
 
 class AttendeeRegistrationView(APIView):
