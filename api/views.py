@@ -152,6 +152,17 @@ class EventReportPDFDownload(APIView):
         # You need to fetch the event data
         event = Event.objects.get(pk=event_id)
         response = generate_event_report_pdf(event)
+        
+        # def create(self, request, *args, **kwargs):
+        #     serializer = self.get_serializer(data=request.data)
+        #     serializer.is_valid(raise_exception=True)
+            
+        #     # Call the create method of the serializer to create the event
+        #     # along with its associated entities
+        #     self.perform_create(serializer)
+            
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
         return response
 
 
@@ -202,6 +213,21 @@ class SpeakerViewSet(viewsets.ModelViewSet):
 class SponsorViewSet(viewsets.ModelViewSet):
     queryset = Sponsor.objects.all()
     serializer_class = SponsorSerializer
+    
+    
+class EventRegistrationView(APIView):
+    def post(self, request):
+        serializer = EventSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            event = serializer.save()
+
+            read_serializer = EventSerializer(event)
+
+            return Response(read_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+           
+            
 
 
 class AttendeeRegistrationView(APIView):

@@ -23,12 +23,18 @@ router.register(r'api/users', views.UserViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    
     path('api/token/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
+    
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
+    
+    path('api/event/register/', views.EventRegistrationView.as_view(), 
+         name='event-registration'),
+    
     path('api/attendee/register/', views.AttendeeRegistrationView.as_view(),
          name='attendee-registration'),
+    
     path('api/speaker/register/', views.SpeakerRegistrationView.as_view(),
          name='speaker-registration'),
 
@@ -44,8 +50,11 @@ urlpatterns = [
 
     path('api/download-attendees-pdf/<int:event_id>/',
          views.AttendeesPDFDownload.as_view(), name='download-attendees-pdf'),
+    
     path('api/download-event-report-pdf/<int:event_id>/',
+         
          views.EventReportPDFDownload.as_view(), name='download-event-report-pdf'),
     path('api/download-event-schedule-pdf/<int:event_id>/',
+         
          views.SchedulePDFDownload.as_view(), name='download-event-schedule-pdf'),
 ]

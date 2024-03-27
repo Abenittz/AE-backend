@@ -57,7 +57,7 @@ class Speaker(models.Model):
 class Sponsor(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    # Add other sponsor fields as needed...
+    
 
     def __str__(self):
         return self.name
