@@ -62,6 +62,12 @@ class AttendeeRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendee
         fields = ('fullname', 'phone', 'email')
+        
+
+
+class AttendeeLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    event_id = serializers.IntegerField()
 
 
 class SpeakerRegistrationSerializer(serializers.ModelSerializer):

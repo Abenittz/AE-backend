@@ -35,6 +35,8 @@ urlpatterns = [
     path('api/attendee/register/', views.AttendeeRegistrationView.as_view(),
          name='attendee-registration'),
     
+    path('api/attendee/login',  views.AttendeeLoginView.as_view(), name='attendee-login'),
+    
     path('api/speaker/register/', views.SpeakerRegistrationView.as_view(),
          name='speaker-registration'),
 

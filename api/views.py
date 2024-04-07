@@ -2,15 +2,20 @@ from rest_framework import viewsets, status
 from .models import Event, Attendee, Speaker, Sponsor
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, SpeakerSerializer, SponsorSerializer, UserSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer
+from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, SpeakerSerializer, SponsorSerializer, UserSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
+
+
 
 
 def generate_attendees_pdf(event):
@@ -198,6 +203,21 @@ class MyTokenObtainPairView(TokenObtainPairView):
 class AttendeeViewSet(viewsets.ModelViewSet):
     queryset = Attendee.objects.all()
     serializer_class = AttendeeSerializer
+    
+# class AttendeeLoginView(APIView):
+#     def post(self, request):
+#         email = request.data.get('email')
+#         name = request.data.get('fullname')
+#         user = Attendee.objects.filter(email=email).first()
+
+#         if user is None:
+#             return Response({'detail': 'Invalid email'}, status=status.HTTP_401_UNAUTHORIZED)
+
+#         refresh = RefreshToken.for_user(user)
+#         return Response({
+#             'refresh': str(refresh),
+#             'access': str(refresh.access_token),
+#         })
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -234,7 +254,7 @@ class EventRegistrationView(APIView):
         except Event.DoesNotExist:
             return Response({'errors': 'user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
         get_event.delete()
-        
+            
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     
@@ -270,6 +290,37 @@ class AttendeeRegistrationView(APIView):
             }
 
             return Response(response_data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class AttendeeLoginView(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        serializer = AttendeeLoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+            event_id = serializer.validated_data.get('event_id')
+            attendee_email = serializer.validated_data.get('email')
+
+            # Check if the event with the given ID exists
+            try:
+                event = Event.objects.get(pk=event_id)
+            except Event.DoesNotExist:
+                return Response({"event": "Event with this ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if the attendee with the given email exists and is registered for the event
+            try:
+                attendee = Attendee.objects.get(email=attendee_email, events_attending=event)
+            except Attendee.DoesNotExist:
+                return Response({"attendee": "Attendee is not registered for this event."}, status=status.HTTP_400_BAD_REQUEST)
+
+           
+            refresh = RefreshToken.for_user(attendee) 
+            return Response({"message": "Attendee logged in successfully", "refresh": str(refresh), "access": str(refresh.access_token)}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

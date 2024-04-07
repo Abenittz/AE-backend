@@ -41,7 +41,7 @@ class Attendee(models.Model):
     phone = models.CharField(max_length=255)
     email = models.EmailField(max_length=255)
     
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_attendee')
+    
 
     def __str__(self):
         return self.fullname
@@ -51,8 +51,7 @@ class Speaker(models.Model):
     fullname = models.CharField(max_length=255)
     organization = models.CharField(max_length=255)
     role = models.CharField(max_length=255)
-
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_speakers')
+    
     
     def __str__(self):
         return self.fullname
@@ -62,7 +61,7 @@ class Sponsor(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_sponsors')
+    
 
     def __str__(self):
         return self.name
@@ -74,7 +73,6 @@ class Schedule(models.Model):
     end_time = models.TimeField()
     activity = models.TextField()
 
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_schedules')
     
     def __str__(self):
         return self.activity

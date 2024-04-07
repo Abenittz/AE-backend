@@ -44,12 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_swagger',
     'corsheaders',
     'api.apps.ApiConfig',
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5000"]
-
+# CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5000", "http://localhost:5173"]
+CORS_ALLOW_ALL_ORIGINS = True 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
