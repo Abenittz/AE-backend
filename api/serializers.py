@@ -1,8 +1,15 @@
 from rest_framework import serializers
 from .models import Event, Attendee, Speaker, Sponsor, Schedule
 from django.contrib.auth import get_user_model
+from .models import EventUser
 
 User = get_user_model()
+
+
+class EventUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventUser
+        fields = ('id', 'username', 'fullname', 'email', 'password', 'is_active', 'is_staff')
 
 
 class UserSerializer(serializers.ModelSerializer):

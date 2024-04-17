@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
 
 
 class Event(models.Model):
@@ -24,6 +26,7 @@ class Event(models.Model):
 
     schedules = models.ManyToManyField(
         'Schedule', related_name='events_scheduled', blank=True)
+    
 
     def __str__(self):
         return self.title
@@ -76,3 +79,71 @@ class Schedule(models.Model):
     
     def __str__(self):
         return self.activity
+
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, password=None, **extra_fields):
+        if not username:
+            raise ValueError('The username field must be set')
+        user = self.model(username=username, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(username, password, **extra_fields)
+
+class EventUser(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=150, unique=True)
+    fullname = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
+    password = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['fullname', 'email', 'password']
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        db_table = 'event_users'
+        default_related_name = 'event_user'
+        permissions = (  
+            ("view_user", "Can view user"),
+            ("add_speaker", "Can add speaker"),
+            ("add_sponsor", "Can add sponsor"),
+            ("change_event", "Can edit event"),
+            ("delete_event", "Can delete event"),
+            ("change_user", "Can edit user"),
+            ("delete_user", "Can delete user"),
+            ("add_admin", "Can add admin"),
+        )
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        related_name='customuser_groups',
+        related_query_name='customuser_group',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        related_name='customuser_permissions',
+        related_query_name='customuser_permission',
+        help_text='Specific permissions for this user.',
+    )

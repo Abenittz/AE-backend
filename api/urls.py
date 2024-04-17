@@ -27,6 +27,10 @@ urlpatterns = [
     path('api/token/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     
+     path('api/register/', views.EventUserRegisterView.as_view(), name='users-register'),
+    path('api/login/', views.EventUserLoginView.as_view(), name='users-login'),
+    path('api/logout/', views.EventUserLogoutView.as_view(), name='users-ogout'),
+    
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     path('api/event/register/', views.EventRegistrationView.as_view(), 

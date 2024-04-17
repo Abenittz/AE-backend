@@ -1,8 +1,8 @@
-from rest_framework import viewsets, status
-from .models import Event, Attendee, Speaker, Sponsor
+from rest_framework import viewsets, status, generics
+from .models import EventUser, Event, Attendee, Speaker, Sponsor
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, SpeakerSerializer, SponsorSerializer, UserSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer
+from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, EventUserSerializer, SpeakerSerializer, SponsorSerializer, UserSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -177,6 +177,11 @@ class SchedulePDFDownload(APIView):
         event = Event.objects.get(pk=event_id)
         response = generate_schedule_pdf(event)
         return response
+    
+
+
+
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -189,36 +194,40 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        # Add custom claims
         token['username'] = user.username
-        # ...
-
+        token['role'] = user.role
+    
         return token
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+    
+    
+    
+class EventUserRegisterView(generics.CreateAPIView):
+    queryset = EventUser.objects.all()
+    serializer_class = EventUserSerializer
+
+class EventUserLoginView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+    
+
+class EventUserLogoutView(generics.GenericAPIView):
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AttendeeViewSet(viewsets.ModelViewSet):
     queryset = Attendee.objects.all()
     serializer_class = AttendeeSerializer
     
-# class AttendeeLoginView(APIView):
-#     def post(self, request):
-#         email = request.data.get('email')
-#         name = request.data.get('fullname')
-#         user = Attendee.objects.filter(email=email).first()
-
-#         if user is None:
-#             return Response({'detail': 'Invalid email'}, status=status.HTTP_401_UNAUTHORIZED)
-
-#         refresh = RefreshToken.for_user(user)
-#         return Response({
-#             'refresh': str(refresh),
-#             'access': str(refresh.access_token),
-#         })
-
 
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all().order_by('-start_date')
