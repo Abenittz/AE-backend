@@ -47,16 +47,24 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'corsheaders',
     'api.apps.ApiConfig',
+    
 ]
 
 # CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5000", "http://localhost:5173"]
 CORS_ALLOW_ALL_ORIGINS = True 
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
     )
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Adjust the expiration time for access tokens
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Adjust the expiration time for refresh tokens
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -123,6 +131,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+
+AUTH_USER_MODEL = "api.EventUSer"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 

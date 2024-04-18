@@ -9,6 +9,7 @@ from rest_framework.routers import DefaultRouter
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
+    TokenObtainPairView
 )
 
 
@@ -19,7 +20,9 @@ router.register(r'api/attendees', views.AttendeeViewSet)
 router.register(r'api/events', views.EventViewSet)
 router.register(r'api/speakers', views.SpeakerViewSet)
 router.register(r'api/sponsors', views.SponsorViewSet)
-router.register(r'api/users', views.UserViewSet)
+# router.register(r'api/users', views.UserViewSet)
+router.register(r'api/eventusers', views.EventUSers)
+
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -27,11 +30,12 @@ urlpatterns = [
     path('api/token/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     
-     path('api/register/', views.EventUserRegisterView.as_view(), name='users-register'),
-    path('api/login/', views.EventUserLoginView.as_view(), name='users-login'),
-    path('api/logout/', views.EventUserLogoutView.as_view(), name='users-ogout'),
+    path('api/register/', views.EventUserRegisterView.as_view(), name='user-register'),
+    path('api/login/', views.EventUserLoginView.as_view(), name='user-login'),
+#     path('api/login/', views.LoginView.as_view(), name='user-login'),
     
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+#     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     path('api/event/register/', views.EventRegistrationView.as_view(), 
          name='event-registration'),
@@ -50,8 +54,8 @@ urlpatterns = [
     path('api/schedule/register/', views.ScheduleRegistrationView.as_view(),
          name='schedule-registration'),
 
-    path('api/users/<int:pk>/',
-         views.UserViewSet.as_view({'get': 'retrieve'}), name='user-detail'),
+#     path('api/users/<int:pk>/',
+#          views.UserViewSet.as_view({'get': 'retrieve'}), name='user-detail'),
 
 
     path('api/download-attendees-pdf/<int:event_id>/',

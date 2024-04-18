@@ -2,20 +2,44 @@ from rest_framework import serializers
 from .models import Event, Attendee, Speaker, Sponsor, Schedule
 from django.contrib.auth import get_user_model
 from .models import EventUser
+from django.contrib.auth import authenticate
 
-User = get_user_model()
-
+# User = get_user_model()
 
 class EventUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventUser
-        fields = ('id', 'username', 'fullname', 'email', 'password', 'is_active', 'is_staff')
+        fields = ['id', 'username', 'fullname', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
 
+    def create(self, validated_data):
+        user = EventUser.objects.create_user(**validated_data)
+        return user
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+class EventUserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+        
+        if username and password:
+            user = authenticate(username=username, password=password)
+            if user:
+                if user.is_active:
+                    data['user'] = user
+                else:
+                    raise serializers.ValidationError("User is not active.")
+            else:
+                raise serializers.ValidationError("Unable to log in with provided credentials.")
+        else:
+            raise serializers.ValidationError("Must provide username and password.")
+        return data
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('id', 'username', 'email', 'first_name', 'last_name')
 
 
 class AttendeeSerializer(serializers.ModelSerializer):
