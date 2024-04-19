@@ -22,6 +22,7 @@ router.register(r'api/speakers', views.SpeakerViewSet)
 router.register(r'api/sponsors', views.SponsorViewSet)
 # router.register(r'api/users', views.UserViewSet)
 router.register(r'api/eventusers', views.EventUSers)
+router.register(r'api/roomid', views.RoomIdViewSet)
 
 
 urlpatterns = [
@@ -33,6 +34,7 @@ urlpatterns = [
     path('api/register/', views.EventUserRegisterView.as_view(), name='user-register'),
     path('api/login/', views.EventUserLoginView.as_view(), name='user-login'),
 #     path('api/login/', views.LoginView.as_view(), name='user-login'),
+    path('api/users/<int:user_id>/', views.EventUsersById.as_view(), name='get_user_by_id'),
     
     
 #     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -53,6 +55,10 @@ urlpatterns = [
 
     path('api/schedule/register/', views.ScheduleRegistrationView.as_view(),
          name='schedule-registration'),
+    
+    path('api/roomId/register/', views.RoomIdRegistrationView.as_view(),
+         name='roomid-registration'),
+    
 
 #     path('api/users/<int:pk>/',
 #          views.UserViewSet.as_view({'get': 'retrieve'}), name='user-detail'),

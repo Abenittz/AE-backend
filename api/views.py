@@ -1,9 +1,9 @@
 from rest_framework import viewsets, status, generics
-from .models import EventUser, Event, Attendee, Speaker, Sponsor
+from .models import EventUser, Event, Attendee, RoomId, Speaker, Sponsor
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView 
 from rest_framework.response import Response
-from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, EventUserLoginSerializer, EventUserSerializer, SpeakerSerializer, SponsorSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer
+from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, EventUserLoginSerializer, EventUserSerializer, RoomIdRegistrationSerilizer, RoomIdSerializer, SpeakerSerializer, SponsorSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -198,6 +198,15 @@ class SchedulePDFDownload(APIView):
 class EventUSers(viewsets.ModelViewSet):
     queryset = EventUser.objects.all()
     serializer_class = EventUserSerializer
+    
+class EventUsersById(APIView):
+    def get(self, request, user_id):
+        try:
+            user = EventUser.objects.get(pk=user_id)
+            serializer = EventUserSerializer(user)
+            return Response(serializer.data)
+        except EventUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -268,7 +277,6 @@ class EventUserLoginView(APIView):
         serializer = EventUserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = authenticate(username=serializer.validated_data['username'], password=serializer.validated_data['password'])
-            print(user)
             if user:
                 if user.is_active:
                     refresh = RefreshToken.for_user(user)
@@ -299,6 +307,11 @@ class SpeakerViewSet(viewsets.ModelViewSet):
 class SponsorViewSet(viewsets.ModelViewSet):
     queryset = Sponsor.objects.all()
     serializer_class = SponsorSerializer
+    
+    
+class RoomIdViewSet(viewsets.ModelViewSet):
+    queryset = RoomId.objects.all()
+    serializer_class = RoomIdSerializer
     
     
 class EventRegistrationView(APIView):
@@ -478,4 +491,28 @@ class ScheduleRegistrationView(APIView):
 
             return Response(response_data, status=status.HTTP_201_CREATED)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class RoomIdRegistrationView(APIView):
+    def post(self, request): 
+        serializer = RoomIdRegistrationSerilizer(data=request.data)
+        
+        if serializer.is_valid():
+            event_id = request.data.get('event')
+            
+            try:
+                event = Event.objects.get(pk=event_id)
+            except Event.DoesNotExist:
+                return Response({"event": "Event with this ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            room_id = serializer.validated_data['roomId']
+            room_id_instance = RoomId.objects.create(roomId=room_id)
+            event.roomids.add(room_id_instance)
+            
+            response_data = {
+                "message": "roomid sent successfully",
+                "data": serializer.data
+            }
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

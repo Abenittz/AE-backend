@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Attendee, Speaker, Sponsor, Schedule
+from .models import Event, Attendee, RoomId, Speaker, Sponsor, Schedule
 from django.contrib.auth import get_user_model
 from .models import EventUser
 from django.contrib.auth import authenticate
@@ -26,6 +26,7 @@ class EventUserLoginSerializer(serializers.Serializer):
         
         if username and password:
             user = authenticate(username=username, password=password)
+            print(user)
             if user:
                 if user.is_active:
                     data['user'] = user
@@ -36,6 +37,9 @@ class EventUserLoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Must provide username and password.")
         return data
+    
+    
+    
 # class UserSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = User
@@ -64,6 +68,11 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = '__all__'
+        
+class RoomIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomId
+        fields = '__all__'
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -73,6 +82,7 @@ class EventSerializer(serializers.ModelSerializer):
     sponsors = SponsorSerializer(many=True, read_only=True)
     attendees = AttendeeSerializer(many=True, read_only=True)
     schedules = ScheduleSerializer(many=True, read_only=True)
+    roomids = RoomIdSerializer(many=True, read_only=True)
 
     start_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M %p")
     end_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M %p")
@@ -117,3 +127,8 @@ class ScheduleRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = ('date', 'start_time', "end_time", "activity")
+        
+class RoomIdRegistrationSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomId
+        fields = ('roomId',)

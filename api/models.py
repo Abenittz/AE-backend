@@ -27,6 +27,10 @@ class Event(models.Model):
     schedules = models.ManyToManyField(
         'Schedule', related_name='events_scheduled', blank=True)
     
+    roomids = models.ManyToManyField(
+        'RoomId', related_name='events_roomid', blank=True
+    )
+    
 
     def __str__(self):
         return self.title
@@ -79,7 +83,12 @@ class Schedule(models.Model):
     
     def __str__(self):
         return self.activity
+    
+class RoomId(models.Model):
+    roomId = models.CharField(max_length=255, ) 
 
+    def __str__(self):
+        return self.roomId
 
 
 class CustomUserManager(BaseUserManager):
