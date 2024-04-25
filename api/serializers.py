@@ -9,8 +9,8 @@ from django.contrib.auth import authenticate
 class EventUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventUser
-        fields = ['id', 'username', 'fullname', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['id', 'username', 'fullname', 'email', 'password', 'is_staff', 'is_active']
+        # extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = EventUser.objects.create_user(**validated_data)

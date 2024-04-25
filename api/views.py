@@ -268,9 +268,13 @@ class EventUserRegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
-            return Response({'refresh': str(refresh), 'access': str(refresh.access_token)}, status=status.HTTP_201_CREATED)
+            serialized_user = EventUserSerializer(user).data  # Serialize the user data
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': serialized_user  # Include serialized user data in the response
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class EventUserLoginView(APIView):
     def post(self, request, format=None):
@@ -280,7 +284,12 @@ class EventUserLoginView(APIView):
             if user:
                 if user.is_active:
                     refresh = RefreshToken.for_user(user)
-                    return Response({'refresh': str(refresh), 'access': str(refresh.access_token)}, status=status.HTTP_200_OK)
+                    user_serializer = EventUserSerializer(user)
+                    return Response({
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token),
+                        'user': user_serializer.data 
+                    }, status=status.HTTP_200_OK)
                 else:
                     return Response({'error': 'User is not active'}, status=status.HTTP_400_BAD_REQUEST)
             else:
