@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Attendee, RoomId, Speaker, Sponsor, Schedule
+from .models import Event, Attendee, RoomId, Speaker, Sponsor, Schedule, Videos
 from django.contrib.auth import get_user_model
 from .models import EventUser
 from django.contrib.auth import authenticate
@@ -128,7 +128,12 @@ class ScheduleRegistrationSerializer(serializers.ModelSerializer):
         model = Schedule
         fields = ('date', 'start_time', "end_time", "activity")
         
-class RoomIdRegistrationSerilizer(serializers.ModelSerializer):
+class RoomIdRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomId
         fields = ('roomId',)
+        
+class VideoUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Videos
+        fields = '__all__'

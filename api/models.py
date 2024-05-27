@@ -89,6 +89,15 @@ class RoomId(models.Model):
 
     def __str__(self):
         return self.roomId
+    
+    
+class Videos(models.Model):
+    video = models.FileField(upload_to="vedeos/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.video
+    
 
 
 class CustomUserManager(BaseUserManager):

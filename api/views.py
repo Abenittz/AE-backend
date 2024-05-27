@@ -1,9 +1,9 @@
 from rest_framework import viewsets, status, generics
-from .models import EventUser, Event, Attendee, RoomId, Speaker, Sponsor
+from .models import EventUser, Event, Attendee, RoomId, Speaker, Sponsor, Videos
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView 
 from rest_framework.response import Response
-from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, EventUserLoginSerializer, EventUserSerializer, RoomIdRegistrationSerilizer, RoomIdSerializer, SpeakerSerializer, SponsorSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer
+from .serializers import EventSerializer, AttendeeSerializer, AttendeeRegistrationSerializer, EventUserLoginSerializer, EventUserSerializer, RoomIdRegistrationSerializer, RoomIdSerializer, SpeakerSerializer, SponsorSerializer, SpeakerRegistrationSerializer, SponsorRegistrationSerializer, ScheduleRegistrationSerializer, AttendeeLoginSerializer, VideoUploadSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -322,6 +322,10 @@ class RoomIdViewSet(viewsets.ModelViewSet):
     queryset = RoomId.objects.all()
     serializer_class = RoomIdSerializer
     
+class uploadsViewset(viewsets.ModelViewSet):
+    queryset = Videos.objects.all()
+    serializer_class = VideoUploadSerializer
+    
     
 class EventRegistrationView(APIView):
     def post(self, request):
@@ -504,7 +508,7 @@ class ScheduleRegistrationView(APIView):
     
 class RoomIdRegistrationView(APIView):
     def post(self, request): 
-        serializer = RoomIdRegistrationSerilizer(data=request.data)
+        serializer = RoomIdRegistrationSerializer(data=request.data)
         
         if serializer.is_valid():
             event_id = request.data.get('event')
@@ -525,3 +529,15 @@ class RoomIdRegistrationView(APIView):
             
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class VideoUpload(APIView):
+    def post(self, request):
+        serializer = VideoUploadSerializer(data=request.data)
+        
+        if (serializer.is_valid()):
+            video = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    

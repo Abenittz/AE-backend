@@ -23,6 +23,7 @@ router.register(r'api/sponsors', views.SponsorViewSet)
 # router.register(r'api/users', views.UserViewSet)
 router.register(r'api/eventusers', views.EventUSers)
 router.register(r'api/roomid', views.RoomIdViewSet)
+router.register(r'api/videos', views.uploadsViewset)
 
 
 urlpatterns = [
@@ -58,6 +59,8 @@ urlpatterns = [
     
     path('api/roomId/register/', views.RoomIdRegistrationView.as_view(),
          name='roomid-registration'),
+    
+    path('api/videos/upload', views.VideoUpload.as_view(), name='upload_videos'),
     
 
 #     path('api/users/<int:pk>/',
