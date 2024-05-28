@@ -31,7 +31,14 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = "celmonlavi@gmail.com"
+EMAIL_HOST_PASSWORD = "slph vhpk fntf udxz"
+EMAIL_PORT = 587
+EMAIL_USE_ETS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 # Application definition
@@ -111,6 +118,8 @@ DATABASES = {
         'PORT': os.getenv('PORT'),
     }
 }
+
+
 
 
 

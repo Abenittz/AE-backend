@@ -1,3 +1,4 @@
+# from datetime import timezone
 from rest_framework import viewsets, status, generics
 from .models import EventUser, Event, Attendee, RoomId, Speaker, Sponsor, Videos
 from rest_framework.views import APIView
@@ -18,8 +19,9 @@ from reportlab.lib.pagesizes import letter
 
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
-
-
+from django.core.mail import send_mail
+from datetime import datetime
+import yagmail
 
 
 
@@ -430,7 +432,8 @@ class SpeakerRegistrationView(APIView):
                 event = Event.objects.get(pk=event_id)
             except Event.DoesNotExist:
                 return Response({"event": "Event with this ID does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
+            
+        
             # Create the speaker
             speaker = serializer.save()
 
@@ -529,8 +532,28 @@ class RoomIdRegistrationView(APIView):
             
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
+class SendMail(APIView):
+    help = 'Send email to attendees if the event has started'
+
+    def get(self, *args, **kwargs):
+        now = datetime.now()
+        events = Event.objects.filter(start_date__lte=now)
+
+        for event in events:
+            
+            attendees = event.attendees.all()
+            for attendee in attendees:
+                self.send_event_start_email(attendee.email, event)
+        return HttpResponse({"msg":"sent"})
+
+    def send_event_start_email(self, email, event):
+        yag = yagmail.SMTP('abenezerttz23@gmail.com', 'slph vhpk fntf udxz')
+        subject = f'Event {event.title} Has Started'
+        message = f'The event {event.title} has started. Please join us at {event.location}.'
+        yag.send(email, subject, message)
+        self.stdout.write(self.style.SUCCESS(f'Email sent to {email} for event {event.title}'))
+
 class VideoUpload(APIView):
     def post(self, request):
         serializer = VideoUploadSerializer(data=request.data)

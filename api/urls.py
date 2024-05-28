@@ -59,6 +59,8 @@ urlpatterns = [
     
     path('api/roomId/register/', views.RoomIdRegistrationView.as_view(),
          name='roomid-registration'),
+    path('api/send_mails/', views.SendMail.as_view(),
+         name='mail'),
     
     path('api/videos/upload', views.VideoUpload.as_view(), name='upload_videos'),
     
